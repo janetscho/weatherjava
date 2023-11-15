@@ -14,38 +14,46 @@ import java.util.TreeMap;
 import org.json.*;
 
 import javafx.application.Application;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Main extends Application {
 
 	// please do not leak this key i will kill you
 	public final static String map = "273a346184cebe767ac61195101d83ae";
+	public final static boolean toggle = true;
 	
 	
     public static void main(String [] args) throws URISyntaxException, IOException {
-        APICall("Los Angeles");
-    	//launch(args);
+        //APICall("Los Angeles");
+    	launch(args);
     }
 
-    @Override
+    //@Override
     public void start(Stage primaryStage) throws Exception {
         // TODO Auto-generated method stub
     	
-    	
-    	
-    	//primaryStage.setScene(scene);
-    	//primaryStage.show();
+    	Scene scene = new Scene();
+    	primaryStage.setScene(scene);
+    	primaryStage.show();
     }
     
     // method to call API and store the resulting JSON data
     public static void APICall(String city) throws URISyntaxException, IOException {
-    	// imperial data
-    	String apiURL = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + map + "&units=imperial";
-    	String forecastURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + city + "&appid=" + map + "&units=imperial";
-
-    	// metric data
-    	//String apiURL = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + map;
-    	//String forecastURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + city + "&appid=" + map;
+    	
+		String apiURL = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + map;
+		String forecastURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + city + "&appid=" + map;
+    	
+    	if(toggle) {
+    		// imperial data
+    		apiURL = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + map + "&units=imperial";
+    		forecastURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + city + "&appid=" + map + "&units=imperial";
+    	}
+    	else {
+    		// metric data
+    		apiURL = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + map;
+    		forecastURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + city + "&appid=" + map;
+    	}
     	
     	// establishes connection with daily API
     	URL url = new URL(apiURL);
@@ -60,11 +68,14 @@ public class Main extends Application {
     	ln = "";
     	rd.close();
     	
+    	// extracting current day data
     	JSONObject data = new JSONObject(jsn.toString());
     	int humidity = data.getJSONObject("main").getInt("humidity");
     	int wind = data.getJSONObject("wind").getInt("speed");
     	String description = data.getJSONArray("weather").getJSONObject(0).getString("description");
     	int temp = data.getJSONObject("main").getInt("temp");
+    	int tempMax = data.getJSONObject("main").getInt("temp_max");
+    	int tempMin = data.getJSONObject("main").getInt("temp_min");
     	int feels = data.getJSONObject("main").getInt("feels_like");
     	int sunrise = data.getJSONObject("sys").getInt("sunrise");
     	int sunset = data.getJSONObject("sys").getInt("sunset");
@@ -85,6 +96,7 @@ public class Main extends Application {
     	JSONArray forecastData = new JSONObject(jsn.toString()).getJSONArray("list");
     	Map<String, JSONObject> checkDate = new TreeMap<>();
     	
+    	// TreeMap to get only one weather per date because it returns data for every 3 hrs
     	for(int i = 0; i < forecastData.length(); i++) {
     		JSONObject day = forecastData.getJSONObject(i);
     		String date = day.getString("dt_txt").split(" ")[0];
@@ -93,13 +105,34 @@ public class Main extends Application {
     			checkDate.put(date, day);
     	}
     	
+    	// checking to validate data
         for (Map.Entry<String, JSONObject> entry : checkDate.entrySet()) {
             System.out.println("Date: " + entry.getKey());
-            System.out.println(entry.getValue());
+            System.out.println(entry.getValue().toString(2));
         }
-    	
-    	
-    	
+        
+        // extracting forecast daily data
+        ArrayList<Integer> forecastTemp = new ArrayList<>();
+        ArrayList<String> forecastDescr = new ArrayList<>();
+        ArrayList<Integer> forecastHigh = new ArrayList<>();
+        ArrayList<Integer> forecastLow = new ArrayList<>();
+        for (Map.Entry<String, JSONObject> entry : checkDate.entrySet()) {
+        	int temperature = entry.getValue().getJSONObject("main").getInt("temp");
+        	String desc = entry.getValue().getJSONArray("weather").getJSONObject(0).getString("description");
+        	int high = entry.getValue().getJSONObject("main").getInt("temp_max");
+        	int low = entry.getValue().getJSONObject("main").getInt("temp_min");
+        	
+        	forecastTemp.add(temperature);
+        	forecastDescr.add(desc);
+        	forecastHigh.add(high);
+        	forecastLow.add(low);
+        }
+        
+        for(int i = 0; i < forecastTemp.size(); i++) {
+        	System.out.println("Temp: " + forecastTemp.get(i));
+        	System.out.println("Description: " + forecastDescr.get(i));
+        	System.out.println("High: " + forecastHigh.get(i));
+        	System.out.println("Low: " + forecastLow.get(i));
+        }
     }
-
 }
