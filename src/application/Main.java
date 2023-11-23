@@ -221,7 +221,7 @@ public class Main extends Application {
     	Text weatherToday = new Text("Weather Today Across the Country");
     	weatherToday.setStyle("-fx-font-size: 20;" +
     			"-fx-font-weight: bold;");
-    	weatherToday.setTranslateX(404);
+    	weatherToday.setTranslateX(520);
     	weatherToday.setTranslateY(177);
     	
     	LocalDate dated = LocalDate.now();
@@ -231,7 +231,7 @@ public class Main extends Application {
     	
     	Rectangle body = new Rectangle(900, 565);
     	body.setFill(Color.WHITE);
-    	body.setTranslateX(384);
+    	body.setTranslateX(510);
     	body.setTranslateY(143);
     	body.setArcWidth(20);
     	body.setArcHeight(20);
@@ -243,23 +243,23 @@ public class Main extends Application {
     	weatherMap.setSmooth(true);
     	weatherMap.setFitWidth(754);
     	weatherMap.setFitHeight(396);
-    	weatherMap.setTranslateX(457);
+    	weatherMap.setTranslateX(583);
     	weatherMap.setTranslateY(237);
     	
     	Text todayscast = new Text("TODAY'S FORECAST");
     	todayscast.setStyle("-fx-font-size: 14;" +
     			"-fx-font-weight: bold;");
-    	todayscast.setTranslateX(404);
+    	todayscast.setTranslateX(530);
     	todayscast.setTranslateY(211);
     	Text today = new Text(date);
     	today.setStyle("-fx-font-size: 14;" +
     			"-fx-font-weight: bold;");
-    	today.setTranslateX(1180);
+    	today.setTranslateX(1300);
     	today.setTranslateY(211);
     	
     	Button readmore = new Button("Read More");
     	readmore.setPrefSize(96, 32);
-    	readmore.setTranslateX(407);
+    	readmore.setTranslateX(533);
     	readmore.setTranslateY(653);
     	readmore.setStyle(
     			"-fx-text-fill: #FFFFFF;" +
@@ -273,7 +273,7 @@ public class Main extends Application {
     	
     	Pane frontBody = new Pane(body, weatherMap, weatherToday, todayscast, today, readmore);
     	
-    	Pane box = new Pane(top, frontBody);
+    	Pane box = new Pane(frontBody, top);
         box.setBackground(new javafx.scene.layout.Background(new javafx.scene.layout.BackgroundFill(Color.web("#E8EEEE"), null, null)));
     	
     	Scene scene = new Scene(box, 1920, 1000);
