@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -60,13 +61,14 @@ public class Main extends Application {
 	public static String icon = "";
 	public static int humidity = 0;
 	public static int wind = 0;
-	public static String description = "";
+	public static String description = "empty";
 	public static int temp = 0;
 	public static int tempMax = 0;
 	public static int tempMin = 0;
 	public static int feels = 0;
 	public static int sunrise = 0;
 	public static int sunset = 0;
+	public static double pressure = 0;
 	public static String timezone = "";
 	public static String country = "";
     public static ArrayList<Integer> forecastTemp = new ArrayList<>();
@@ -119,16 +121,16 @@ public class Main extends Application {
     	search.setOnKeyPressed(e -> {
     		if(e.getCode() == KeyCode.ENTER) {
     			city = search.getText();
-    			try {
-					APICall(city);
+//    			try {
+//					APICall(city);
 					
 					secondStage();
 					primaryStage.close();
 					
-				} catch (URISyntaxException | IOException e1) {
+//				}  catch (URISyntaxException | IOException e1) {
 					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+					// e1.printStackTrace();
+//				}
     		}
     	});
     	
@@ -148,19 +150,31 @@ public class Main extends Application {
     	header.setHeight(80);
     	header.setFill(Color.web("#005986"));
     	
-    	// F / C
+    	// F / C    	
     	ToggleButton fc = new ToggleButton("°C");
     	fc.setPrefWidth(45);
-    	fc.setStyle(
-    			"-fx-base: #EF9E1C;" +
-    			"-fx-text-fill: #FFFFFF;" +
-    			"-fx-background-color: #82D1DB;" +
-    			"-fx-background-insets: 0, 1;" +
-    			"-fx-background-radius: 5em;" +
-    			"-fx-padding: 5px;" +
-    			"-fx-font-size: 14px;" +
-    			"-fx-content-display: center;"
-    			);
+    	if(!toggle) {
+        	fc.setStyle(
+        			"-fx-base: #EF9E1C;" +
+        			"-fx-text-fill: #FFFFFF;" +
+        			"-fx-background-color: #82D1DB;" +
+        			"-fx-background-insets: 0, 1;" +
+        			"-fx-background-radius: 5em;" +
+        			"-fx-padding: 5px;" +
+        			"-fx-font-size: 14px;" +
+        			"-fx-content-display: center;"
+        			);
+    	} else {
+    		fc.setStyle(
+	    			"-fx-background-color: #82D1DB;" +
+	    			"-fx-text-fill: #FFFFFF;" +
+	    			"-fx-background-insets: 0, 1;" +
+	    			"-fx-background-radius: 5em;" +
+	    			"-fx-padding: 5px;" +
+	    			"-fx-font-size: 14px;" +
+	    			"-fx-content-display: center;"
+	    			);
+    	}
     	fc.setOnAction(e -> {
     		if(fc.isSelected()) {
     			fc.setText("°F");
@@ -177,6 +191,7 @@ public class Main extends Application {
     		}
     		else {
     			fc.setText("°C");
+    			toggle = true;
     	    	fc.setStyle(
     	    			"-fx-background-color: #82D1DB;" +
     	    			"-fx-text-fill: #FFFFFF;" +
@@ -481,7 +496,7 @@ public class Main extends Application {
     	primaryStage.show();
     }
     
-    private void secondStage() {
+    private static void secondStage() {
     	Stage stage = new Stage();
     	
     	String iconURL = "https://openweathermap.org/img/w/" + icon + ".png";
@@ -527,13 +542,12 @@ public class Main extends Application {
     			try {
 					APICall(city);
 					secondStage();
+					Stage currentStage = (Stage) search.getScene().getWindow();
+					currentStage.close();
 				} catch (URISyntaxException | IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-    			//primaryStage.setScene(null);
-    			//primaryStage.close();
-    			//secondStage();
     		}
     	});
     	
@@ -556,16 +570,28 @@ public class Main extends Application {
     	// F / C
     	ToggleButton fc = new ToggleButton("°C");
     	fc.setPrefWidth(45);
-    	fc.setStyle(
-    			"-fx-base: #EF9E1C;" +
-    			"-fx-text-fill: #FFFFFF;" +
-    			"-fx-background-color: #82D1DB;" +
-    			"-fx-background-insets: 0, 1;" +
-    			"-fx-background-radius: 5em;" +
-    			"-fx-padding: 5px;" +
-    			"-fx-font-size: 14px;" +
-    			"-fx-content-display: center;"
-    			);
+    	if(!toggle) {
+        	fc.setStyle(
+        			"-fx-base: #EF9E1C;" +
+        			"-fx-text-fill: #FFFFFF;" +
+        			"-fx-background-color: #82D1DB;" +
+        			"-fx-background-insets: 0, 1;" +
+        			"-fx-background-radius: 5em;" +
+        			"-fx-padding: 5px;" +
+        			"-fx-font-size: 14px;" +
+        			"-fx-content-display: center;"
+        			);
+    	} else {
+    		fc.setStyle(
+	    			"-fx-background-color: #82D1DB;" +
+	    			"-fx-text-fill: #FFFFFF;" +
+	    			"-fx-background-insets: 0, 1;" +
+	    			"-fx-background-radius: 5em;" +
+	    			"-fx-padding: 5px;" +
+	    			"-fx-font-size: 14px;" +
+	    			"-fx-content-display: center;"
+	    			);
+    	}
     	fc.setOnAction(e -> {
     		if(fc.isSelected()) {
     			fc.setText("°F");
@@ -649,11 +675,11 @@ public class Main extends Application {
         timeBox.setTranslateY(135);
         timeBox.setArcHeight(20);
         timeBox.setArcWidth(20);
-        timeBox.setFill(Color.web("#337A9E"));
+        timeBox.setFill(Color.web("#0A4453"));
         Rectangle tempTimeBox = new Rectangle(900, 27);
         tempTimeBox.setTranslateX(510);
         tempTimeBox.setTranslateY(160);
-        tempTimeBox.setFill(Color.web("#337A9E"));
+        tempTimeBox.setFill(Color.web("#0A4453"));
         
     	String currentCity = city + ", " + country + " As of " + timezone;
     	Text location = new Text(currentCity);
@@ -664,16 +690,76 @@ public class Main extends Application {
     	location.setFill(Color.WHITE);
     	location.setTranslateX(525);
     	location.setTranslateY(168);
+    	
+    	DropShadow shadow = new DropShadow();
+    	shadow.setOffsetX(0);
+    	shadow.setOffsetY(0);
+    	shadow.setColor(Color.web("#696969"));
         
         Rectangle currentW = new Rectangle(900, 235);
         currentW.setTranslateX(510);
         currentW.setTranslateY(135);
     	currentW.setArcWidth(20);
     	currentW.setArcHeight(20);
+    	currentW.setFill(Color.web("#337A9E"));
+    	currentW.setEffect(drop);
     	
-    	Pane timePane = new Pane(currentW, timeBox, tempTimeBox, location);
+    	String tempo = temp + "\u00B0";
+    	Text tempText = new Text(tempo);
+    	tempText.setStyle("-fx-font-size: 98;");
+    	tempText.setFill(Color.WHITE);
+    	tempText.setTranslateX(525);
+    	tempText.setTranslateY(280);
+    	tempText.setEffect(shadow);
+    	
+    	Text descr = new Text(description);
+    	descr.setStyle("-fx-font-size: 24");
+    	descr.setFill(Color.WHITE);
+    	descr.setTranslateX(526);
+    	descr.setTranslateY(315);
+    	descr.setEffect(shadow);
+    	
+    	String stringhighLow = "High " + tempMax + "\u00B0 / Low " + tempMin + "\u00B0";
+    	Text highLow = new Text(stringhighLow);
+    	highLow.setStyle("-fx-font-size: 24;");
+    	highLow.setFill(Color.WHITE);
+    	highLow.setTranslateX(526);
+    	highLow.setTranslateY(350);
+    	
+    	icons.setSmooth(true);
+    	icons.setPreserveRatio(true);
+    	icons.setFitWidth(200);
+    	icons.setTranslateX(645);
+    	icons.setTranslateY(145);
+    	
+    	String stringfeelsLike = "Feels like " + feels + "\u00B0";
+    	Text feelsLike = new Text(stringfeelsLike);
+    	feelsLike.setStyle("-fx-font-size: 24;");
+    	feelsLike.setFill(Color.WHITE);
+    	String stringHum = "Humidity " + humidity + "%";
+    	Text hum = new Text(stringHum);
+    	hum.setStyle("-fx-font-size: 24;");
+    	hum.setFill(Color.WHITE);
+    	String stringWind = "Wind " + wind;
+    	if(toggle)
+    		stringWind += " kph";
+    	else
+    		stringWind += " mph";
+    	Text windy = new Text(stringWind);
+    	windy.setStyle("-fx-font-size: 24;");
+    	windy.setFill(Color.WHITE);
+    	String stringPres = "Pressure " + pressure + " inHg";
+    	Text pres = new Text(stringPres);
+    	pres.setStyle("-fx-font-size: 24;");
+    	pres.setFill(Color.WHITE);
+    	
+    	VBox etc = new VBox(10, feelsLike, hum, windy, pres);
+    	etc.setTranslateX(1020);
+    	etc.setTranslateY(195);
+    	
+    	Pane timePane = new Pane(currentW, timeBox, tempTimeBox, location, tempText, descr, highLow, icons, etc);
         
-    	Pane all = new Pane(top, timePane);
+    	Pane all = new Pane(timePane, top);
     	
     	Scene scene = new Scene(all, 1920, 1000);
     	stage.setScene(scene);
@@ -721,7 +807,17 @@ public class Main extends Application {
     	sunrise = data.getJSONObject("sys").getInt("sunrise");
     	sunset = data.getJSONObject("sys").getInt("sunset");
     	country = data.getJSONObject("sys").getString("country");
+    	pressure = data.getJSONObject("main").getInt("pressure");
+    	double pressureTemp = pressure * 0.02952998751;
+    	
+    	DecimalFormat df = new DecimalFormat("#.##");
+    	pressure = Double.parseDouble(df.format(pressureTemp));
+    	
     	int timeTemp = data.getInt("timezone");
+    	
+    	System.out.println(data);
+    	System.out.println(pressure);
+    	
     	
     	long currentTime = System.currentTimeMillis();
     	Instant inst = Instant.ofEpochMilli(currentTime);
