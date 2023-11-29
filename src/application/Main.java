@@ -20,6 +20,7 @@ import java.util.TreeMap;
 
 import org.json.*;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
@@ -58,6 +59,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 public class Main extends Application {
@@ -101,9 +103,14 @@ public class Main extends Application {
     public static void main(String [] args) throws URISyntaxException, IOException {
       launch(args);
     }
-
+    
     //@Override
     public void start(Stage primaryStage) throws Exception {
+    	uiStart(primaryStage);
+    }
+    	
+    private static void uiStart(Stage primaryStage) {
+
         // TODO Auto-generated method stub
 
       DropShadow drop = new DropShadow();
@@ -120,6 +127,15 @@ public class Main extends Application {
       view.setFitWidth(57);
       view.setTranslateX(320);
       view.setTranslateY(11);
+      
+      view.setOnMouseClicked(event -> {
+    	 try {
+			restartApp(primaryStage);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+      });
 
       Text ibm = new Text("An IBM Business");
       ibm.setFont(Font.font("Arial", FontWeight.BOLD, 14));
@@ -147,7 +163,11 @@ public class Main extends Application {
           APICall(city);
 
           secondStage();
-          primaryStage.close();
+          PauseTransition delay = new PauseTransition(Duration.millis(500));
+          delay.setOnFinished(event -> {
+              primaryStage.close();
+          });
+          delay.play();
 
         }  catch (URISyntaxException | IOException e1) {
           // TODO Auto-generated catch block
@@ -246,6 +266,42 @@ public class Main extends Application {
       mem.setPrefHeight(40);
       mem.setTranslateY(80);
       mem.setStyle("-fx-background-color: #337A9E;");
+      
+      HBox temporaryArray = new HBox();
+      Label temporary = new Label();
+      if(previous.size() == 0)
+    	  temporary.setText("");
+      else
+    	  temporary = new Label("   " + temp + "\u00B0 " + city);
+      
+      temporary.setStyle("-fx-font-size: 18;");
+      temporary.setTextFill(Color.WHITE);
+      ImageView tempIcon = new ImageView(new Image("https://openweathermap.org/img/w/" + icon + ".png"));
+      tempIcon.setPreserveRatio(true);
+      tempIcon.setSmooth(true);
+      tempIcon.setFitWidth(25);
+      temporaryArray.getChildren().add(tempIcon);
+      temporaryArray.getChildren().add(temporary);
+      previous.add(temporaryArray);
+
+      if(previous.size() > 4 || temporary.getText() == "") {
+        previous.remove(0);
+      }
+
+      mem.setAlignment(Pos.CENTER_LEFT);
+      mem.setSpacing(40);
+        for(int i = 0; i < previous.size(); i++) {
+          HBox hboxTemp = previous.get(i);
+          hboxTemp.setMinWidth(300);
+          hboxTemp.setAlignment(Pos.CENTER);
+          mem.getChildren().addAll(hboxTemp);
+
+            if(i < previous.size() - 1) {
+              Separator separator = new Separator();
+              separator.setOrientation(javafx.geometry.Orientation.VERTICAL);
+              mem.getChildren().addAll(separator);
+            }
+        }
 
       // login
       ImageView login = new ImageView();
@@ -505,7 +561,7 @@ public class Main extends Application {
 
       // ----------------------------------------------------------------
 
-      Rectangle temp = new Rectangle(1920, 2000);
+      Rectangle temp = new Rectangle(1920, 1800);
       temp.setFill(Color.web("#E8EEEE"));
 
       Pane frontBody = new Pane(temp ,body, weatherMap, weatherToday, todayscast, today, readmore);
@@ -517,7 +573,7 @@ public class Main extends Application {
           new Stop(1, Color.web("D8EEEE")));
 
 
-        box.setBackground(new javafx.scene.layout.Background(new javafx.scene.layout.BackgroundFill(Color.web("D8EEEE"), null, null)));
+        box.setBackground(new javafx.scene.layout.Background(new javafx.scene.layout.BackgroundFill(Color.web("E8EEEE"), null, null)));
         box.setPadding(new Insets(20));
 
         ScrollPane scrollPane = new ScrollPane(box);
@@ -532,6 +588,7 @@ public class Main extends Application {
 
     private static void secondStage() {
       Stage stage = new Stage();
+      stage.initStyle(StageStyle.UNDECORATED);
 
       String iconURL = "https://openweathermap.org/img/w/" + icon + ".png";
       ImageView icons = new ImageView(new Image(iconURL));
@@ -550,7 +607,16 @@ public class Main extends Application {
       view.setFitWidth(57);
       view.setTranslateX(320);
       view.setTranslateY(11);
-
+      
+      view.setOnMouseClicked(event -> {
+    	 try {
+			restartApp(stage);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+      });
+      
       Text ibm = new Text("An IBM Business");
       ibm.setFont(Font.font("Arial", FontWeight.BOLD, 14));
       ibm.setFill(Color.WHITE);
@@ -572,16 +638,15 @@ public class Main extends Application {
 
       search.setOnKeyPressed(e -> {
         if(e.getCode() == KeyCode.ENTER) {
-          city = search.getText();
-          //try {
-        //	APICall(city);
-          secondStage();
-          Stage currentStage = (Stage) search.getScene().getWindow();
-          currentStage.close();
-        //} catch (URISyntaxException | IOException e1) {
-          // TODO Auto-generated catch block
-        //	e1.printStackTrace();
-        //}
+	          city = search.getText();
+	          try {
+	        	APICall(city);
+		        secondStage();
+	          stage.close();
+	        } catch (URISyntaxException | IOException e1) {
+	          // TODO Auto-generated catch block
+	        	e1.printStackTrace();
+	        }
         }
       });
 
@@ -988,7 +1053,7 @@ public class Main extends Application {
       stackRadar.setTranslateX(510);
       stackRadar.setTranslateY(1320);
       
-      Rectangle temp = new Rectangle(1920, 2000);
+      Rectangle temp = new Rectangle(1920, 1900);
       temp.setFill(Color.web("#E8EEEE"));
 
       Pane all = new Pane(temp, dailyPane, stackRadar, forecastPane, timePane, top);
@@ -1101,6 +1166,17 @@ public class Main extends Application {
         loginStage.show();
       }
 
+    private static void restartApp(Stage primaryStage) throws Exception {
+    	Stage newStage = new Stage();
+    	newStage.initStyle(StageStyle.UNDECORATED);
+    	//newStage.setX(primaryStage.getX() - 10);
+    	uiStart(newStage);
+    	PauseTransition delay = new PauseTransition(Duration.millis(500));
+    	delay.setOnFinished(e -> {
+    		primaryStage.close();
+    	});
+    	delay.play();
+    }
 
     // method to call API and store the resulting JSON data
     public static void APICall(String city) throws URISyntaxException, IOException {
@@ -1179,7 +1255,7 @@ public class Main extends Application {
 
       //System.out.println(forecastData);
 
-
+      forecastToday.clear();
 
       // TreeMap to get only one weather per date because it returns data for every 3 hrs
       for(int i = 0; i < forecastData.length(); i++) {
@@ -1222,6 +1298,7 @@ public class Main extends Application {
       forecastLow.clear();
       forecastDates.clear();
       forecastIcon.clear();
+
         // extracting forecast daily data
         for (Map.Entry<String, JSONObject> entry : checkDate.entrySet()) {
           int temperature = entry.getValue().getJSONObject("main").getInt("temp");
